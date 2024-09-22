@@ -64,76 +64,6 @@ const Navbar = () => {
     }
   }
 
-  const parsePresentationJSON = () => {
-    const currentScene = editor.scene.exportToJSON()
-
-    const updatedScenes = scenes.map((scn) => {
-      if (scn.id === currentScene.id) {
-        return {
-          id: currentScene.id,
-          duration: 5000,
-          layers: currentScene.layers,
-          name: currentScene.name,
-        }
-      }
-      return {
-        id: scn.id,
-        duration: 5000,
-        layers: scn.layers,
-        name: scn.name,
-      }
-    })
-
-    if (currentDesign) {
-      const presentationTemplate: IDesign = {
-        id: currentDesign.id,
-        type: "PRESENTATION",
-        name: currentDesign.name,
-        frame: currentDesign.frame,
-        scenes: updatedScenes,
-        metadata: {},
-        preview: "",
-      }
-      makeDownload(presentationTemplate)
-    } else {
-      console.log("NO CURRENT DESIGN")
-    }
-  }
-
-  const parseVideoJSON = () => {
-    const currentScene = editor.scene.exportToJSON()
-    const updatedScenes = scenes.map((scn) => {
-      if (scn.id === currentScene.id) {
-        return {
-          id: scn.id,
-          duration: scn.duration,
-          layers: currentScene.layers,
-          name: currentScene.name ? currentScene.name : "",
-        }
-      }
-      return {
-        id: scn.id,
-        duration: scn.duration,
-        layers: scn.layers,
-        name: scn.name ? scn.name : "",
-      }
-    })
-    if (currentDesign) {
-      const videoTemplate: IDesign = {
-        id: currentDesign.id,
-        type: "VIDEO",
-        name: currentDesign.name,
-        frame: currentDesign.frame,
-        scenes: updatedScenes,
-        metadata: {},
-        preview: "",
-      }
-      makeDownload(videoTemplate)
-    } else {
-      console.log("NO CURRENT DESIGN")
-    }
-  }
-
   const makeDownload = (data: Object) => {
     const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data))}`
     const a = document.createElement("a")
@@ -143,15 +73,7 @@ const Navbar = () => {
   }
 
   const makeDownloadTemplate = async () => {
-    if (editor) {
-      if (editorType === "GRAPHIC") {
-        return parseGraphicJSON()
-      } else if (editorType === "PRESENTATION") {
-        return parsePresentationJSON()
-      } else {
-      return parseVideoJSON()
-      }
-    }
+    if (editor) parseGraphicJSON()
   }
 
   const loadGraphicTemplate = async (payload: IDesign) => {
@@ -222,14 +144,7 @@ const Navbar = () => {
   const handleImportTemplate = React.useCallback(
     async (data: any) => {
       let template
-      if (data.type === "GRAPHIC") {
-        template = await loadGraphicTemplate(data)
-      } else if (data.type === "PRESENTATION") {
-        template = await loadPresentationTemplate(data)
-      } else if (data.type === "VIDEO") {
-        template = await loadVideoTemplate(data)
-      }
-      //   @ts-ignore
+      template = await loadGraphicTemplate(data)
       setScenes(template.scenes)
       //   @ts-ignore
       setCurrentDesign(template.design)
